@@ -124,6 +124,7 @@ if chosen_action == "1":
         addon_categories[count] = addon["categories"]
         addon_icon_url[count] = addon["icon_url"]
         addon_followers[count] = addon["follows"]
+        print(addon)
     debug(f"Total data length is: {len(addon_names)+len(addon_project_ids)+len(addon_downloads)+len(addon_short_descriptions)+len(addon_categories)+len(addon_icon_url)+len(addon_followers)}")
 
     print("\n",addon_names[1],"\n",addon_project_ids[1],"\n",addon_downloads[1],"\n",addon_short_descriptions[1],"\n",addon_versions[1],"\n",addon_categories[1],"\n",addon_icon_url[1],"\n",addon_followers[1],"\n")

@@ -36,6 +36,16 @@ url_get_findrequest_string_type_mod = "&facets=[[%22project_type:mod%22]]"
 url_get_findproject = "https://api.modrinth.com/v2/project/"
 
 # VERY IMPORTANT LISTS/DICTIONARIES!
+global addon_names
+global addon_project_ids
+global addon_downloads
+global addon_short_descriptions
+global addon_versions
+global addon_categories
+global addon_icon_url
+global addon_followers
+global addon_slug
+addon_slug = {}
 addon_names = {}
 addon_project_ids = {}
 addon_downloads = {}
@@ -46,7 +56,7 @@ addon_icon_url = {}
 addon_followers = {}
 # Headers for requests
 headers = {
-    'User-Agent': 'https://github.com/yehorscode/CreateAddons-Site (create-addons@proton.me)'}
+    'User-Agent': 'https://github.com/blueprint-site/blueprint-site.github.io (blueprint-site@proton.me)'}
 
 # DEBUG MODE (Default: True)
 debug_mode = True
@@ -83,7 +93,7 @@ if chosen_action == "1":
 #    fmod_search_limit = int(input(f"{Fore.CYAN}How many hits to make? (30'000/manual) "))
 
     # Search limit
-    fmod_search_limit = 30000
+    fmod_search_limit = 300
     # Default search input
     fmod_search_query = "create"
     # Labrinth search request
@@ -122,12 +132,18 @@ if chosen_action == "1":
         addon_short_descriptions[count] = addon["description"]
         addon_versions[count] = addon["versions"]
         addon_categories[count] = addon["categories"]
-        addon_icon_url[count] = addon["icon_url"]
+        addon_slug[count] = addon["slug"]
+        if len(addon["icon_url"]) != 0:
+            addon_icon_url[count] = str(addon["icon_url"])
+        else:
+            addon_icon_url[count] = "https://i.ibb.co/G0mQDM5/no-icon.png"
         addon_followers[count] = addon["follows"]
         print(addon)
     debug(f"Total data length is: {len(addon_names)+len(addon_project_ids)+len(addon_downloads)+len(addon_short_descriptions)+len(addon_categories)+len(addon_icon_url)+len(addon_followers)}")
 
-    print("\n",addon_names[1],"\n",addon_project_ids[1],"\n",addon_downloads[1],"\n",addon_short_descriptions[1],"\n",addon_versions[1],"\n",addon_categories[1],"\n",addon_icon_url[1],"\n",addon_followers[1],"\n")
+    print("\n",addon_names[1],"\n",addon_slug[1],"\n",addon_project_ids[1],"\n",addon_downloads[1],"\n",addon_short_descriptions[1],"\n",addon_versions[1],"\n",addon_categories[1],"\n",addon_icon_url[1],"\n",addon_followers[1],"\n")
+    critical_error(len(addon_icon_url))
+
 elif chosen_action == "2":
     debug("Chosen Action 2", 1)
 

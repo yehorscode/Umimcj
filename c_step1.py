@@ -62,41 +62,97 @@ def error(error_text):
 
 # Action selection menu
 print(f"""\n{Back.CYAN}Choose an action:{Back.RESET}
-{Fore.CYAN}1. Modrinth Create Mod data gathering
-2. Curseforge Create Mod data gathering
+{Fore.CYAN}1. Curseforge Create Mod data gathering
+2. nothing
 C. Color check
-L. Labrinth status check{Fore.RESET}""")
+L. Labrinth status check (old thingy){Fore.RESET}""")
 
 # Action input
 chosen_action = input(f"Input: ")
 
 # Setting app an api
-import selenium
-from selenium import webdriver
-from selenium.webdriver import firefox
-from selenium.webdriver.common import by
-driver = webdriver.Firefox()
-from time import sleep
-import pandas as pd
-from bs4 import BeautifulSoup
+
 # Action running
+global addon_names
+global addon_project_ids
+global addon_downloads
+global addon_short_descriptions
+global addon_versions
+global addon_categories
+global addon_icon_url
+global addon_url
+global addon_authors
+addon_names = {}
+addon_project_ids = {}
+addon_downloads = {}
+addon_short_descriptions = {}
+addon_versions = {}
+addon_categories = {}
+addon_icon_url = {}
+addon_url = {}
+addon_authors = {}
+
+headers = {
+  'Accept': 'application/json',
+  'x-api-key': '$2a$10$R5io95EuQkiR/VinRayi2ONdTuSfW.xzZ9j/TKVDwZ8dN1V4j3b/e'
+}
+
 if chosen_action == "1":
     debug("Chosen Action 1")
 
-    driver.get("https://www.curseforge.com/minecraft/search?page=1&pageSize=50&sortBy=relevancy&class=mc-mods&categories=create")
-    sleep(5)
+    url_api = "https://api.curseforge.com/"
 
-    with open('curseforge.html', 'w') as outfile:
-        outfile.write(driver.page_source)
+    debug(f"Trying to request: {url_api+'v1/mods/search/'}\n With given parameters: gameId=432, searchFilter=create, classId=6")
 
-    driver.close()
+    fmod_search = requests.get(url_api+'v1/mods/search/', params={'gameId': 432,
+                                                                  'searchFilter': 'create',
+                                                                  'classId': 6}, headers=headers)
 
-    bs = BeautifulSoup(open("curseforge.html"), "html.parser")
-    find_names = bs.findAll("span", "ellipsis")
-    print(bs.find("span", "ellipsis"))
-    print(find_names[1])
-    with open('curseforge.txt', 'w') as outfile:
-        outfile.write(str(find_names))
+
+
+    # Debugging stuff
+    if fmod_search.status_code == 200:
+        debug("Curseforge is working and it is avaible! " + str(fmod_search.status_code))
+    else:
+        critical_error("Curseforge is NOT working, stopping the app...")
+        critical_error(f"The error message was: {fmod_search.status_code}")
+
+    # Actually doing the work it needs to do
+    fmod_search = fmod_search.json()
+    fmod_search = fmod_search["data"]
+    print(len(fmod_search))
+    print("---------")
+    counter = -1
+    for i in range(len(fmod_search)):
+        addon_names[i] = fmod_search[i]["name"]
+        addon_project_ids[i] = fmod_search[i]["id"]
+        addon_downloads[i] = fmod_search[i]["downloadCount"]
+        addon_short_descriptions[i] = fmod_search[i]["summary"]
+        addon_versions[i] = fmod_search[i]["latestFiles"]
+        addon_categories[i] = fmod_search[i]["categories"]
+        addon_icon_url[i] = fmod_search[i]["logo"]["url"]
+        addon_url[i] = fmod_search[i]["links"]["websiteUrl"]
+        addon_authors[i] = fmod_search[i]["authors"]
+    print("-----")
+
+    r = requests.get(url_api+'v1/categories', params={
+  'gameId': '432',
+    }, headers = headers)
+
+    print(r)
+
+    with open('categories.json', 'w') as f:
+        try:
+            json.dump(r.json(), f)
+        except:
+            f.write(r.text)
+
+
+    with open('fmod_search.json', 'w') as f:
+        try:
+            json.dump(fmod_search.json(), f)
+        except:
+            f.write(str(fmod_search))
 
 elif chosen_action == "2":
     debug("Chosen Action 2", 1)

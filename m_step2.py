@@ -1,7 +1,7 @@
 from PIL import Image
 import requests
 from io import BytesIO
-from index import addon_icon_url
+from m_step1 import addon_icon_url
 from playsound import *
 
 def is_color_present_from_url(image_url, target_color):
@@ -32,7 +32,7 @@ def is_color_present_from_url(image_url, target_color):
 playsound("/home/yehors/Pobrane/sound.wav")
 print(len(addon_icon_url))
 colordata = {}
-# Example usage
+# Example usagee
 for i in range(len(addon_icon_url)):
     image_url = addon_icon_url[i]
     target_color = (117, 148, 240)  # Red color in RGB

@@ -45,6 +45,7 @@ global addon_categories
 global addon_icon_url
 global addon_followers
 global addon_slug
+global addon_authors
 addon_slug = {}
 addon_names = {}
 addon_project_ids = {}
@@ -54,6 +55,7 @@ addon_versions = {}
 addon_categories = {}
 addon_icon_url = {}
 addon_followers = {}
+addon_authors = {}
 # Headers for requests
 headers = {
     'User-Agent': 'https://github.com/blueprint-site/blueprint-site.github.io (blueprint-site@proton.me)'}
@@ -93,27 +95,79 @@ if chosen_action == "1":
 #    fmod_search_limit = int(input(f"{Fore.CYAN}How many hits to make? (30'000/manual) "))
 
     # Search limit
-    fmod_search_limit = 300
+    fmod_search_limit = 100
+    fmod_search_offset = 0
+
     # Default search input
     fmod_search_query = "create"
-    # Labrinth search request
-    fmod_search_mods = requests.get(f"https://api.modrinth.com/v2/search?query={fmod_search_query}&facets=[[%22project_type:mod%22]]&limit={fmod_search_limit}", headers=headers)
-    file = open("data.txt", "w")
-    file.write("")
-    file.write(str(fmod_search_mods.json()))
-    file.close()
-    # Debug messages
-    debug(f"Trying to request: https://api.modrinth.com/v2/search?query={fmod_search_query}&facets=[[%22project_type:mod%22]]&limit={fmod_search_limit}")
 
-    # Response messages
-    if fmod_search_mods.status_code == 200:
-        debug("Request finished succesfully")
+    l_part1 = {}
+    l_part2 = {}
+    l_part3 = {}
+
+
+    # Labrinth search request
+    part1 = requests.get(f"https://api.modrinth.com/v2/search?query={fmod_search_query}&facets=[[%22project_type:mod%22]]&limit={fmod_search_limit}&offset={fmod_search_offset}", headers=headers)
+    fmod_search_offset+= 100
+
+    debug(f"Trying to request: https://api.modrinth.com/v2/search?query={fmod_search_query}&facets=[[%22project_type:mod%22]]&limit={fmod_search_limit}&offset={fmod_search_offset}")
+    if part1.status_code == 200:
+        debug("Labrinth is working and it is avaible!")
     else:
-        critical_error("Something is wrong with the request")
+        critical_error("Labrinth is NOT working, stopping the app...")   
+
+    part2 = requests.get(f"https://api.modrinth.com/v2/search?query={fmod_search_query}&facets=[[%22project_type:mod%22]]&limit={fmod_search_limit}&offset={fmod_search_offset}", headers=headers)
+    fmod_search_offset+= 100
+
+    debug(f"Trying to request: https://api.modrinth.com/v2/search?query={fmod_search_query}&facets=[[%22project_type:mod%22]]&limit={fmod_search_limit}&offset={fmod_search_offset}")
+    if part2.status_code == 200:
+        debug("Labrinth is working and it is avaible!")
+    else:
+        critical_error("Labrinth is NOT working, stopping the app...")   
+
+    part3 = requests.get(f"https://api.modrinth.com/v2/search?query={fmod_search_query}&facets=[[%22project_type:mod%22]]&limit={fmod_search_limit}&offset={fmod_search_offset}", headers=headers)
+
+    debug(f"Trying to request: https://api.modrinth.com/v2/search?query={fmod_search_query}&facets=[[%22project_type:mod%22]]&limit={fmod_search_limit}&offset={fmod_search_offset}")
+    if part3.status_code == 200:
+        debug("Labrinth is working and it is avaible!")
+    else:
+        critical_error("Labrinth is NOT working, stopping the app...")    
+
+    # Combining "parts"
+    part1 = part1.json()
+    part1 = part1["hits"]
+    print(part1)
+
+    part2 = part2.json()
+    part2 = part2["hits"]
+    print(part2)
+
+    part3 = part3.json()
+    part3 = part3["hits"]
+    print(part3)
+
+    # Combining "parts"
+    fmod_search_mods = {}
+    # Combine part1
+    for i in range(100):
+        fmod_search_mods[i] = part1[i]
+
+    # Combine part2
+    for i in range(100):
+        fmod_search_mods[i + 100] = part2[i]
+
+    # Combine part3
+    for i in range(100):
+        fmod_search_mods[i + 200] = part3[i]
     
+    with open("data.json", "w") as file:
+        json.dump(fmod_search_mods, file)
+#    file = open("data.txt", "w")
+#    file.write("")
+#    file.write(str(fmod_search_mods.json()))
+#    file.close()
+    # Debug messages
     # Converting the response to json
-    json_fmod_response = fmod_search_mods.json()
-    hits = json_fmod_response["hits"]
     # Searching throught the response and adding it to the python dictionary
 #addon_names = {}
 #addon_project_ids = {}
@@ -123,22 +177,24 @@ if chosen_action == "1":
 #addon_categories = {}
 #addon_icon_url = {}
 #addon_followers = {}
+    print(fmod_search_mods)
     count = -1
-    for addon in tqdm(hits):
+    for addon in fmod_search_mods:
         count +=1
-        addon_names[count] = addon["title"]
-        addon_project_ids[count] = addon["project_id"]
-        addon_downloads[count] = addon["downloads"]
-        addon_short_descriptions[count] = addon["description"]
-        addon_versions[count] = addon["versions"]
-        addon_categories[count] = addon["categories"]
-        addon_slug[count] = addon["slug"]
-        if len(addon["icon_url"]) != 0:
-            addon_icon_url[count] = str(addon["icon_url"])
+        addon_names[count] = fmod_search_mods[count]["title"]
+        addon_project_ids[count] = fmod_search_mods[count]["project_id"]
+        addon_downloads[count] = fmod_search_mods[count]["downloads"]
+        addon_short_descriptions[count] = fmod_search_mods[count]["description"]
+        addon_versions[count] = fmod_search_mods[count]["versions"]
+        addon_categories[count] = fmod_search_mods[count]["categories"]
+        addon_slug[count] = fmod_search_mods[count]["slug"]
+        if len(fmod_search_mods[count]["icon_url"]) != 0:
+            addon_icon_url[count] = str(fmod_search_mods[count]["icon_url"])
         else:
-            addon_icon_url[count] = "https://i.ibb.co/G0mQDM5/no-icon.png"
-        addon_followers[count] = addon["follows"]
-        print(addon)
+            addon_icon_url[count] = "https://i.ibb.co/VTs7SXg/no-icon.png"
+        addon_followers[count] = fmod_search_mods[count]["follows"]
+        addon_authors[count] = fmod_search_mods[count]["author"]
+
     debug(f"Total data length is: {len(addon_names)+len(addon_project_ids)+len(addon_downloads)+len(addon_short_descriptions)+len(addon_categories)+len(addon_icon_url)+len(addon_followers)}")
 
     print("\n",addon_names[1],"\n",addon_slug[1],"\n",addon_project_ids[1],"\n",addon_downloads[1],"\n",addon_short_descriptions[1],"\n",addon_versions[1],"\n",addon_categories[1],"\n",addon_icon_url[1],"\n",addon_followers[1],"\n")

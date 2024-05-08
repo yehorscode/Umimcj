@@ -1,5 +1,5 @@
 import json
-from index import *
+from m_step1 import *
 
 with open("manual_data.json", 'r') as manual_data:
     check_data = json.load(manual_data)

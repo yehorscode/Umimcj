@@ -1,5 +1,5 @@
 import json
-from index import *
+from m_step1 import *
 
 data = open("colordata.json", 'r')
 data = json.load(data)

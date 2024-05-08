@@ -1,6 +1,6 @@
-from index import addon_names, addon_project_ids, addon_downloads, addon_short_descriptions, addon_versions, addon_categories, addon_icon_url, addon_followers, addon_slug
+from m_step1 import addon_names, addon_project_ids, addon_downloads, addon_short_descriptions, addon_versions, addon_categories, addon_icon_url, addon_followers, addon_slug
 from time import sleep
-from index import debug, critical_error, error
+from m_step1 import debug, critical_error, error
 import json
 
 key = "create"

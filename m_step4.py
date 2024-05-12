@@ -30,3 +30,5 @@ for i in range(len(data)):
 
 with open("data/final_data.json", 'w') as outfile:
     json.dump(final_data, outfile)
+
+print(len(final_data))

@@ -22,7 +22,7 @@ def display_image_from_url(image_url):
 root = tk.Tk()
 root.title("Addon Confirmation App")
 
-data = open("data/cert_data.json", 'r')
+data = open("colordata.json", 'r')
 data = json.load(data)
 
 manual_data = {}
@@ -31,7 +31,7 @@ current_addon_index = 0
 def display_next_addon():
     global current_addon_index
     while current_addon_index < len(data):
-        if data[str(current_addon_index)] == "No" or data[str(current_addon_index)] == "Maybe":
+        if data[str(current_addon_index)] == "False" or data[str(current_addon_index)] == "Maybe":
             display_addon_info(current_addon_index)
             current_addon_index += 1
             break  # Exit the loop after displaying an addon

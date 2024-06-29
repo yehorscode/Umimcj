@@ -4,6 +4,8 @@ from io import BytesIO
 from m_step1 import addon_icon_url
 from playsound import *
 
+playsound("/usr/share/sounds/freedesktop/stereo/suspend-error.oga")
+
 def is_color_present_from_url(image_url, target_color):
     """
     Check if the given color is present in the image from URL.
@@ -48,4 +50,4 @@ import json
 with open('colordata.json', 'w') as convert_file: 
      convert_file.write(json.dumps(colordata))
 
-playsound("/home/yehors/Pobrane/sound.wav")
+playsound("/usr/share/sounds/freedesktop/stereo/suspend-error.oga")
